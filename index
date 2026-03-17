@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lorcana Card Database</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink-amber:#C9A227;--ink-amethyst:#7B2D8B;--ink-emerald:#2E7D32;
+  --ink-ruby:#B71C1C;--ink-sapphire:#1565C0;--ink-steel:#455A64;
+  --bg:#ffffff;--bg2:#f7f6f2;--bg3:#f0ede6;
+  --text:#1a1a1a;--text2:#666;--text3:#999;
+  --border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.2);
+  --radius:8px;--radius-lg:12px;--radius-xl:16px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1a1a1a;--bg2:#242424;--bg3:#2e2e2e;
+  --text:#f0ede6;--text2:#aaa;--text3:#666;
+  --border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.22);
+}}
+body{font-family:'Crimson Pro',Georgia,serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.header{padding:0.75rem 1.25rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;border-bottom:0.5px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100;}
+.logo{font-family:'Cinzel',serif;font-size:20px;font-weight:600;color:var(--ink-amber);letter-spacing:.04em;line-height:1;white-space:nowrap;text-decoration:none;}
+.logo span{font-size:10px;font-weight:400;color:var(--text2);display:block;font-family:'Crimson Pro',serif;letter-spacing:.1em;}
+.search-bar{flex:1;min-width:160px;}
+.search-bar input{width:100%;height:34px;padding:0 12px;border:0.5px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font-size:14px;outline:none;transition:border-color .15s;}
+.search-bar input:focus{border-color:var(--ink-amber);}
+.header-right{display:flex;align-items:center;gap:8px;}
+.nav-tabs{display:flex;gap:4px;background:var(--bg2);border-bottom:0.5px solid var(--border);padding:0 1.25rem;}
+.nav-tab{padding:10px 16px;font-family:'Cinzel',serif;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none;letter-spacing:.04em;}
+.nav-tab:hover{color:var(--text);}
+.nav-tab.active{color:var(--ink-amber);border-bottom-color:var(--ink-amber);}
+.auth-btn{height:32px;padding:0 14px;border:0.5px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text2);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Cinzel',serif;white-space:nowrap;}
+.auth-btn.logged-in{border-color:var(--ink-amber);color:var(--ink-amber);}
+.avatar{width:22px;height:22px;border-radius:50%;object-fit:cover;}
+.filter-section{background:var(--bg2);border-bottom:0.5px solid var(--border);}
+.filter-row{padding:0.45rem 1.25rem;display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.filter-label{font-size:11px;color:var(--text2);letter-spacing:.06em;font-family:'Cinzel',serif;white-space:nowrap;min-width:36px;}
+.pill-group{display:flex;gap:4px;flex-wrap:wrap;}
+.pill{height:26px;padding:0 10px;border:0.5px solid var(--border);border-radius:13px;background:var(--bg);color:var(--text2);font-size:11px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:'Cinzel',serif;white-space:nowrap;transition:all .12s;}
+.pill.active{border-width:1.5px;color:var(--text);font-weight:600;}
+.pill .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.pill.p-amber.active{border-color:var(--ink-amber);color:var(--ink-amber);}
+.pill.p-amethyst.active{border-color:var(--ink-amethyst);color:var(--ink-amethyst);}
+.pill.p-emerald.active{border-color:var(--ink-emerald);color:var(--ink-emerald);}
+.pill.p-ruby.active{border-color:var(--ink-ruby);color:var(--ink-ruby);}
+.pill.p-sapphire.active{border-color:var(--ink-sapphire);color:var(--ink-sapphire);}
+.pill.p-steel.active{border-color:var(--ink-steel);color:var(--ink-steel);}
+.pill.p-song.active{border-color:#e53935;color:#c62828;}
+.pill.p-char.active{border-color:#1565C0;color:#1565C0;}
+.pill.p-action.active{border-color:#E65100;color:#E65100;}
+.pill.p-item.active{border-color:#2E7D32;color:#2E7D32;}
+.pill.p-location.active{border-color:#6A1B9A;color:#6A1B9A;}
+select{height:28px;padding:0 6px;border:0.5px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font-size:13px;cursor:pointer;}
+.stats-bar{padding:0.4rem 1.25rem;display:flex;gap:1rem;align-items:center;font-size:13px;color:var(--text2);}
+.stats-bar strong{color:var(--text);}
+.view-toggle{margin-left:auto;display:flex;gap:3px;}
+.view-btn{height:26px;width:26px;border:0.5px solid var(--border);border-radius:var(--radius);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.view-btn.active{background:var(--bg2);}
+.view-btn svg{width:13px;height:13px;fill:var(--text2);}
+.cards-grid{padding:1rem 1.25rem 3rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;}
+.cards-grid.list-view{grid-template-columns:1fr;gap:4px;}
+.card-item{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:border-color .15s,transform .12s;position:relative;}
+.card-item:hover{transform:translateY(-2px);border-color:var(--border2);}
+.card-item.owned{border-color:var(--ink-amber);border-width:1.5px;}
+.owned-star{position:absolute;top:6px;left:6px;background:var(--ink-amber);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;z-index:2;}
+.card-img-wrap{position:relative;aspect-ratio:5/7;background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;overflow:hidden;}
+.no-img-initial{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:18px;font-weight:600;}
+.no-img-name{font-size:11px;color:var(--text2);text-align:center;padding:0 6px;line-height:1.3;}
+.song-badge{position:absolute;top:7px;right:7px;background:#e53935;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;}
+.enchanted-badge{position:absolute;bottom:0;left:0;right:0;text-align:center;background:rgba(201,162,39,.88);color:#fff;font-size:9px;font-family:'Cinzel',serif;padding:3px 0;}
+.card-info{padding:8px 10px 10px;}
+.card-name{font-family:'Cinzel',serif;font-size:11px;font-weight:600;color:var(--text);line-height:1.3;}
+.card-subtitle{font-size:10px;color:var(--text2);font-style:italic;margin-top:1px;}
+.card-meta{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;align-items:center;}
+.badge{font-size:10px;padding:1px 6px;border-radius:8px;border:0.5px solid;font-family:'Cinzel',serif;}
+.rarity-c{border-color:#90A4AE;color:#546E7A;}.rarity-u{border-color:#66BB6A;color:#2E7D32;}
+.rarity-r{border-color:#42A5F5;color:#1565C0;}.rarity-sr{border-color:#AB47BC;color:#7B1FA2;}
+.rarity-l{border-color:var(--ink-amber);color:#9a7a20;}.rarity-e{border-color:var(--ink-amber);color:#9a7a20;background:rgba(201,162,39,.08);}
+.ink-dot-sm{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;}
+.cost-badge{font-size:11px;font-weight:600;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid;flex-shrink:0;}
+.type-char{border-color:#90CAF9;color:#1565C0;background:#E3F2FD;}.type-action{border-color:#FFCC80;color:#E65100;background:#FFF3E0;}
+.type-item{border-color:#A5D6A7;color:#2E7D32;background:#E8F5E9;}.type-location{border-color:#CE93D8;color:#6A1B9A;background:#F3E5F5;}
+.type-song{border-color:#EF9A9A;color:#C62828;background:#FFEBEE;}
+.list-card{display:flex;align-items:center;gap:10px;padding:8px 12px;}
+.list-thumb{width:36px;height:50px;border-radius:4px;background:var(--bg2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:13px;font-weight:600;border:0.5px solid var(--border);}
+.list-info{flex:1;min-width:0;}
+.list-name{font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:var(--text);}
+.list-sub{font-size:11px;color:var(--text2);font-style:italic;}
+.list-right{display:flex;gap:5px;align-items:center;flex-shrink:0;}
+.loading{text-align:center;padding:4rem;color:var(--text2);font-family:'Cinzel',serif;font-size:13px;}
+.spinner{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--ink-amber);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.empty{text-align:center;padding:4rem;color:var(--text2);}
+.empty p{font-family:'Cinzel',serif;font-size:14px;margin-top:.5rem;}
+.err-msg{background:#fff8e1;color:#856404;padding:8px 14px;border-radius:var(--radius);font-size:12px;margin:.5rem 1.25rem;border:0.5px solid #ffe082;}
+.pagination{display:flex;align-items:center;justify-content:center;gap:5px;padding:0 1.25rem 2rem;}
+.page-btn{height:30px;min-width:30px;padding:0 8px;border:0.5px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text);cursor:pointer;font-size:12px;font-family:'Crimson Pro',serif;}
+.page-btn.active{background:var(--bg2);border-color:var(--border2);font-weight:600;}
+.page-btn:disabled{opacity:.35;cursor:default;}
+.modal-bg{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--bg);border-radius:var(--radius-xl);border:0.5px solid var(--border);max-width:700px;width:100%;margin:auto;}
+.modal-hdr{padding:1rem 1.25rem 0;display:flex;justify-content:space-between;align-items:center;}
+.modal-close{background:none;border:0.5px solid var(--border);border-radius:50%;width:28px;height:28px;cursor:pointer;color:var(--text2);font-size:14px;display:flex;align-items:center;justify-content:center;}
+.modal-body{padding:1rem 1.25rem 1.5rem;display:grid;grid-template-columns:175px 1fr;gap:1.25rem;}
+@media(max-width:500px){.modal-body{grid-template-columns:1fr;}}
+.modal-img{border-radius:var(--radius);overflow:hidden;aspect-ratio:5/7;background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;}
+.modal-initial{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:24px;font-weight:600;}
+.modal-details h1{font-family:'Cinzel',serif;font-size:19px;font-weight:600;line-height:1.2;color:var(--text);}
+.detail-sub{font-style:italic;color:var(--text2);margin:3px 0 10px;font-size:13px;}
+.detail-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;align-items:center;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:12px;}
+.stat-box{background:var(--bg2);border-radius:var(--radius);padding:7px;text-align:center;}
+.stat-label{font-size:10px;color:var(--text2);font-family:'Cinzel',serif;}
+.stat-val{font-size:19px;font-weight:600;color:var(--text);margin-top:1px;}
+.detail-sec{margin-top:10px;}
+.detail-sec h3{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;color:var(--text2);margin-bottom:4px;text-transform:uppercase;}
+.detail-sec p{font-size:13px;line-height:1.7;color:var(--text);}
+.ability-list{list-style:none;}
+.ability-list li{font-size:12px;padding:5px 0;border-bottom:0.5px solid var(--border);line-height:1.5;color:var(--text);}
+.ability-list li:last-child{border-bottom:none;}
+.flavor-text{font-style:italic;color:var(--text2);font-size:12px;border-left:2px solid var(--ink-amber);padding-left:9px;margin-top:3px;line-height:1.6;border-radius:0;}
+.disney-box{background:var(--bg2);border-radius:var(--radius);padding:9px 11px;margin-top:4px;}
+.disney-film{font-size:13px;font-weight:500;font-family:'Cinzel',serif;color:var(--text);}
+.disney-time{font-size:12px;color:var(--text2);margin-top:2px;}
+.yt-wrap{grid-column:1/-1;margin-top:4px;}
+.yt-wrap h3{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;color:var(--text2);margin-bottom:7px;text-transform:uppercase;}
+.yt-frame{width:100%;aspect-ratio:16/9;border-radius:var(--radius);border:none;}
+.ink-pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:2px 9px;border-radius:9px;border:0.5px solid;}
+.film-tag{font-size:11px;padding:2px 8px;border-radius:9px;border:0.5px solid var(--border);color:var(--text2);}
+.set-tag{font-size:11px;padding:2px 8px;border-radius:9px;border:0.5px solid var(--border);color:var(--text2);}
+.collect-btn{width:100%;height:36px;border-radius:var(--radius);border:0.5px solid var(--border);background:var(--bg2);color:var(--text2);font-family:'Cinzel',serif;font-size:12px;cursor:pointer;margin-top:10px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.collect-btn:hover{border-color:var(--ink-amber);color:var(--ink-amber);}
+.collect-btn.owned{background:rgba(201,162,39,.12);border-color:var(--ink-amber);color:var(--ink-amber);font-weight:600;}
+.login-hint{font-size:11px;color:var(--text3);text-align:center;margin-top:6px;}
+.collection-page{padding:1.5rem 1.25rem;}
+.collection-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px;}
+.collection-header h2{font-family:'Cinzel',serif;font-size:18px;font-weight:600;color:var(--text);}
+.collection-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.5rem;}
+.cstat{background:var(--bg2);border-radius:var(--radius-lg);padding:1rem;text-align:center;}
+.cstat .cn{font-size:26px;font-weight:600;color:var(--ink-amber);font-family:'Cinzel',serif;}
+.cstat .cl{font-size:11px;color:var(--text2);margin-top:2px;}
+.not-logged{text-align:center;padding:4rem 1rem;}
+.not-logged p{font-family:'Cinzel',serif;font-size:14px;color:var(--text2);margin-bottom:1.5rem;line-height:1.8;}
+.login-big-btn{height:44px;padding:0 24px;border-radius:var(--radius);border:0.5px solid var(--border);background:var(--bg);color:var(--text);font-family:'Cinzel',serif;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .15s;}
+.login-big-btn:hover{border-color:var(--ink-amber);color:var(--ink-amber);}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a class="logo" href="#">LORCANA<span>Card Database</span></a>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="カード名・テキストを検索...">
+  </div>
+  <div class="header-right">
+    <button class="auth-btn" id="authBtn" onclick="handleAuth()">Googleでログイン</button>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <button class="nav-tab active" data-tab="cards" onclick="switchTab('cards')">カード一覧</button>
+  <button class="nav-tab" data-tab="collection" onclick="switchTab('collection')">マイコレクション</button>
+</div>
+
+<div id="cardsPage">
+  <div class="filter-section">
+    <div class="filter-row">
+      <span class="filter-label">タイプ</span>
+      <div class="pill-group" id="typeFilters">
+        <button class="pill active" data-type="">すべて</button>
+        <button class="pill p-char" data-type="Character">キャラクター</button>
+        <button class="pill p-action" data-type="Action">アクション</button>
+        <button class="pill p-item" data-type="Item">アイテム</button>
+        <button class="pill p-location" data-type="Location">ロケーション</button>
+        <button class="pill p-song" data-type="Song">♪ 歌カード</button>
+      </div>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">インク</span>
+      <div class="pill-group" id="inkFilters">
+        <button class="pill active" data-ink="">全て</button>
+        <button class="pill p-amber" data-ink="Amber"><span class="dot" style="background:var(--ink-amber)"></span>Amber</button>
+        <button class="pill p-amethyst" data-ink="Amethyst"><span class="dot" style="background:var(--ink-amethyst)"></span>Amethyst</button>
+        <button class="pill p-emerald" data-ink="Emerald"><span class="dot" style="background:var(--ink-emerald)"></span>Emerald</button>
+        <button class="pill p-ruby" data-ink="Ruby"><span class="dot" style="background:var(--ink-ruby)"></span>Ruby</button>
+        <button class="pill p-sapphire" data-ink="Sapphire"><span class="dot" style="background:var(--ink-sapphire)"></span>Sapphire</button>
+        <button class="pill p-steel" data-ink="Steel"><span class="dot" style="background:var(--ink-steel)"></span>Steel</button>
+      </div>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">絞込</span>
+      <select id="filmFilter"><option value="">すべての作品</option></select>
+      <select id="setFilter" style="margin-left:4px;">
+        <option value="">全セット</option>
+        <option value="1">The First Chapter</option>
+        <option value="2">Rise of the Floodborn</option>
+        <option value="3">Into the Inklands</option>
+        <option value="4">Ursula's Return</option>
+        <option value="5">Shimmering Skies</option>
+        <option value="6">Azurite Sea</option>
+      </select>
+      <select id="rarityFilter" style="margin-left:4px;">
+        <option value="">全レアリティ</option>
+        <option value="Common">Common</option>
+        <option value="Uncommon">Uncommon</option>
+        <option value="Rare">Rare</option>
+        <option value="Super Rare">Super Rare</option>
+        <option value="Legendary">Legendary</option>
+        <option value="Enchanted">Enchanted</option>
+      </select>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <span id="statsText">読み込み中...</span>
+    <div class="view-toggle">
+      <button class="view-btn active" id="gridViewBtn"><svg viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg></button>
+      <button class="view-btn" id="listViewBtn"><svg viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="2.5" rx="1"/><rect x="1" y="6.75" width="14" height="2.5" rx="1"/><rect x="1" y="11.5" width="14" height="2.5" rx="1"/></svg></button>
+    </div>
+  </div>
+  <div id="errMsg"></div>
+  <div id="loadingDiv" class="loading"><div class="spinner"></div>カードを読み込んでいます...</div>
+  <div id="cardsContainer" class="cards-grid" style="display:none;"></div>
+  <div class="pagination" id="pagination" style="display:none;"></div>
+</div>
+
+<div id="collectionPage" style="display:none;">
+  <div class="collection-page"><div id="collectionContent"></div></div>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-hdr"><div></div><button class="modal-close" id="modalClose">✕</button></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, doc, getDoc, getDocs, setDoc, deleteDoc, collection } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+const app = initializeApp({
+  apiKey:"AIzaSyB5YWlZxDTfK5cWyTn235yWpDiARzVrytE",
+  authDomain:"glimmer-databese-jp.firebaseapp.com",
+  projectId:"glimmer-databese-jp",
+  storageBucket:"glimmer-databese-jp.firebasestorage.app",
+  messagingSenderId:"1010953885339",
+  appId:"1:1010953885339:web:af76fd63264e37ab5cd83e"
+});
+const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+const INK_COLORS={Amber:'#C9A227',Amethyst:'#7B2D8B',Emerald:'#2E7D32',Ruby:'#B71C1C',Sapphire:'#1565C0',Steel:'#455A64'};
+const RARITY_CLASS={Common:'rarity-c',Uncommon:'rarity-u',Rare:'rarity-r','Super Rare':'rarity-sr',Legendary:'rarity-l',Enchanted:'rarity-e'};
+const SET_NAMES={1:'The First Chapter',2:'Rise of the Floodborn',3:'Into the Inklands',4:"Ursula's Return",5:'Shimmering Skies',6:'Azurite Sea'};
+const FILM_MAP={'Elsa':'Frozen','Anna':'Frozen','Olaf':'Frozen','Kristoff':'Frozen','Mickey Mouse':'Mickey Mouse','Minnie Mouse':'Mickey Mouse','Goofy':'Mickey Mouse','Donald Duck':'Mickey Mouse','Ariel':'The Little Mermaid','Ursula':'The Little Mermaid','Sebastian':'The Little Mermaid','Flounder':'The Little Mermaid','Triton':'The Little Mermaid','Simba':'The Lion King','Mufasa':'The Lion King','Scar':'The Lion King','Nala':'The Lion King','Timon':'The Lion King','Pumbaa':'The Lion King','Moana':'Moana','Maui':'Moana','Cinderella':'Cinderella','Fairy Godmother':'Cinderella','Belle':'Beauty and the Beast','Beast':'Beauty and the Beast','Gaston':'Beauty and the Beast','Lumiere':'Beauty and the Beast','Aladdin':'Aladdin','Genie':'Aladdin','Jasmine':'Aladdin','Jafar':'Aladdin','Iago':'Aladdin','Maleficent':'Sleeping Beauty','Aurora':'Sleeping Beauty','Stitch':'Lilo & Stitch','Lilo':'Lilo & Stitch','Rapunzel':'Tangled','Flynn Rider':'Tangled','Mulan':'Mulan','Merida':'Brave','Pinocchio':'Pinocchio','Woody':'Toy Story','Buzz Lightyear':'Toy Story','Jessie':'Toy Story','Tigger':'Winnie the Pooh','Hades':'Hercules','Hercules':'Hercules','Megara':'Hercules','Tinker Bell':'Peter Pan','Peter Pan':'Peter Pan','Captain Hook':'Peter Pan','Snow White':'Snow White','Evil Queen':'Snow White'};
+const DISNEY_SCENES={'Elsa':{film:'Frozen (2013)',time:'1:02:15 — 「Let It Go」シーン',dp:true},'Anna':{film:'Frozen (2013)',time:'0:05:30 — 「Do You Want to Build a Snowman?」',dp:true},'Ariel':{film:'The Little Mermaid (1989)',time:'0:23:40 — 「Part of Your World」',dp:true},'Simba':{film:'The Lion King (1994)',time:'0:08:00 — サークル・オブ・ライフ',dp:true},'Moana':{film:'Moana (2016)',time:'0:12:30 — 海との出会い',dp:true},'Cinderella':{film:'Cinderella (1950)',time:'0:40:15 — 「A Dream Is a Wish」',dp:true},'Ursula':{film:'The Little Mermaid (1989)',time:'0:32:00 — 「Poor Unfortunate Souls」',dp:true},'Maleficent':{film:'Sleeping Beauty (1959)',time:'0:18:00 — 呪いの宣告',dp:true},'Mickey Mouse':{film:'Steamboat Willie (1928)',time:'0:01:00 — 船での航行',dp:true},'Rapunzel':{film:'Tangled (2010)',time:'0:25:00 — 「When Will My Life Begin」',dp:true},'Mulan':{film:'Mulan (1998)',time:'0:28:00 — 「Reflection」',dp:true},'Gaston':{film:'Beauty and the Beast (1991)',time:'0:30:00 — 「Gaston」ソング',dp:true}};
+const YT_MAP={'Elsa':'https://www.youtube.com/embed/L0MK7qz13bU','Ariel':'https://www.youtube.com/embed/mf1BnkX-aP8','Moana':'https://www.youtube.com/embed/cPAbx5kgCJo','Simba':'https://www.youtube.com/embed/GibiNy4d4gc','Ursula':'https://www.youtube.com/embed/l6cWKqYms9Y','Cinderella':'https://www.youtube.com/embed/4r9DJB6MHpU','Rapunzel':'https://www.youtube.com/embed/ZG1hq6wBBK0','Mulan':'https://www.youtube.com/embed/5RqBT10Ehzs','Gaston':'https://www.youtube.com/embed/NFgHMJGFpSc'};
+
+let allCards=[],filteredCards=[],currentPage=1,viewMode='grid';
+let activeInk='',activeType='',filmFilter='',setFilter='',rarityFilter='',searchTerm='';
+let currentUser=null,myCollection=new Set(),currentModalCard=null;
+const PAGE_SIZE=24;
+const $=id=>document.getElementById(id);
+
+function getFilm(card){const n=card.Name||'';for(const[k,v] of Object.entries(FILM_MAP)){if(n.includes(k))return v;}return '';}
+function isSong(card){return(card.Type||'').toLowerCase()==='song'||(card.Subtypes||'').toLowerCase().includes('song');}
+function getEType(card){return isSong(card)?'Song':card.Type||'';}
+function getIC(card){return INK_COLORS[card.Color||card.Ink||'']||'#888';}
+function getRC(card){return RARITY_CLASS[card.Rarity]||'rarity-c';}
+function getTBC(type){return{Character:'type-char',Action:'type-action',Item:'type-item',Location:'type-location',Song:'type-song'}[type]||'';}
+function cid(card){return(card.Name||'')+'__'+(card.Subtitle||card.Version||'')+'__'+(card.Set_Num||0);}
+
+onAuthStateChanged(auth,async user=>{
+  currentUser=user;
+  const btn=$('authBtn');
+  if(user){
+    btn.className='auth-btn logged-in';
+    btn.innerHTML=(user.photoURL?`<img src="${user.photoURL}" class="avatar">`:'')+(user.displayName||'マイページ');
+    await loadCollection();
+  }else{
+    btn.className='auth-btn';
+    btn.innerHTML='Googleでログイン';
+    myCollection.clear();
+  }
+  renderCards();
+  if(document.querySelector('.nav-tab[data-tab="collection"]').classList.contains('active'))renderCollectionPage();
+});
+
+window.handleAuth=async()=>{
+  if(currentUser){if(confirm('ログアウトしますか？'))await signOut(auth);}
+  else{try{await signInWithPopup(auth,provider);}catch(e){console.error(e);}}
+};
+
+async function loadCollection(){
+  if(!currentUser)return;
+  try{
+    const snap=await getDocs(collection(db,'users',currentUser.uid,'collection'));
+    myCollection.clear();
+    snap.forEach(d=>myCollection.add(d.id));
+  }catch(e){console.error(e);}
+}
+
+async function toggleCollection(card){
+  if(!currentUser){alert('コレクション機能にはログインが必要です');return;}
+  const id=cid(card);
+  const ref=doc(db,'users',currentUser.uid,'collection',id);
+  try{
+    if(myCollection.has(id)){await deleteDoc(ref);myCollection.delete(id);}
+    else{
+      await setDoc(ref,{name:card.Name||'',subtitle:card.Subtitle||'',color:card.Color||'',type:card.Type||'',rarity:card.Rarity||'',set_num:card.Set_Num||0,cost:card.Cost||0,addedAt:new Date().toISOString()});
+      myCollection.add(id);
+    }
+    renderCards();
+    if(currentModalCard&&cid(currentModalCard)===id)updateCollectBtn(card);
+    if(document.querySelector('.nav-tab[data-tab="collection"]').classList.contains('active'))renderCollectionPage();
+  }catch(e){console.error(e);alert('エラー: '+e.message);}
+}
+
+function updateCollectBtn(card){
+  const btn=document.getElementById('collectBtn');
+  if(!btn)return;
+  const owned=myCollection.has(cid(card));
+  btn.className='collect-btn'+(owned?' owned':'');
+  btn.innerHTML=owned?'★ コレクションから削除':'☆ コレクションに追加';
+}
+
+async function fetchCards(){
+  try{
+    const cacheRef=doc(db,'_cache','cards_v1');
+    const snap=await getDoc(cacheRef);
+    if(snap.exists()){const d=snap.data();if(Date.now()-(d.updatedAt||0)<24*3600*1000&&d.cards?.length>0)return d.cards;}
+  }catch(e){}
+  try{
+    const r=await fetch('https://api.lorcana-api.com/cards/all?page=1&pagesize=500');
+    if(r.ok){
+      const d=await r.json();
+      const cards=Array.isArray(d)?d:(d.cards||d.data||[]);
+      if(cards.length>0){
+        try{await setDoc(doc(db,'_cache','cards_v1'),{cards,updatedAt:Date.now()});}catch(e){}
+        return cards;
+      }
+    }
+  }catch(e){}
+  return null;
+}
+
+function applyFilters(){
+  filteredCards=allCards.filter(card=>{
+    const n=(card.Name||'').toLowerCase(),s=(card.Subtitle||'').toLowerCase(),b=(card.Body_Text||'').toLowerCase(),f=(card.Flavor_Text||'').toLowerCase();
+    if(searchTerm&&!n.includes(searchTerm)&&!s.includes(searchTerm)&&!b.includes(searchTerm)&&!f.includes(searchTerm))return false;
+    if(activeInk&&(card.Color||card.Ink||'')!==activeInk)return false;
+    if(activeType){if(activeType==='Song'&&!isSong(card))return false;if(activeType!=='Song'&&(card.Type||'')!==activeType)return false;}
+    if(filmFilter&&getFilm(card)!==filmFilter)return false;
+    if(setFilter&&String(card.Set_Num||'')!==setFilter)return false;
+    if(rarityFilter&&(card.Rarity||'')!==rarityFilter)return false;
+    return true;
+  });
+  currentPage=1;renderCards();renderPagination();updateStats();
+}
+
+function renderCards(){
+  const container=$('cardsContainer');if(!container)return;
+  const start=(currentPage-1)*PAGE_SIZE;
+  const pageCards=filteredCards.slice(start,start+PAGE_SIZE);
+  if(!pageCards.length){container.innerHTML='<div class="empty" style="grid-column:1/-1"><p>カードが見つかりません</p></div>';return;}
+  container.innerHTML=pageCards.map(card=>{
+    const ic=getIC(card),song=isSong(card),n=card.Name||'(Unknown)',etype=getEType(card),owned=myCollection.has(cid(card));
+    const cardData=JSON.stringify(card).replace(/"/g,'&quot;');
+    if(viewMode==='list'){
+      return`<div class="card-item list-card${owned?' owned':''}" onclick="openModal(this)" data-card="${cardData}">${owned?'<div class="owned-star">★</div>':''}<div class="list-thumb" style="color:${ic};border-color:${ic}40">${n[0]}</div><div class="list-info"><div class="list-name">${n}</div>${card.Subtitle?`<div class="list-sub">${card.Subtitle}</div>`:''}</div><div class="list-right">${card.Cost!=null?`<span class="cost-badge" style="border-color:${ic};color:${ic}">${card.Cost}</span>`:''}<span class="ink-dot-sm" style="background:${ic}"></span>${etype?`<span class="badge ${getTBC(etype)}">${etype}</span>`:''}<span class="badge ${getRC(card)}">${(card.Rarity||'').replace('Super Rare','SR').replace('Legendary','L').replace('Enchanted','E').replace('Common','C').replace('Uncommon','U').replace('Rare','R')}</span>${song?'<span style="color:#e53935;font-size:13px">♪</span>':''}</div></div>`;
+    }
+    return`<div class="card-item${owned?' owned':''}" onclick="openModal(this)" data-card="${cardData}">${owned?'<div class="owned-star">★</div>':''}<div class="card-img-wrap" style="border-bottom:2px solid ${ic}20"><div class="no-img-initial" style="background:${ic}18;color:${ic}">${n[0]}</div><div class="no-img-name">${n.length>16?n.slice(0,15)+'…':n}</div>${song?'<div class="song-badge">♪</div>':''}${(card.Rarity||'')==='Enchanted'?'<div class="enchanted-badge">✦ ENCHANTED</div>':''}</div><div class="card-info"><div class="card-name">${n}</div>${card.Subtitle?`<div class="card-subtitle">${card.Subtitle}</div>`:''}<div class="card-meta">${card.Cost!=null?`<span class="cost-badge" style="border-color:${ic};color:${ic}">${card.Cost}</span>`:''}<span class="ink-dot-sm" style="background:${ic}"></span>${etype?`<span class="badge ${getTBC(etype)}">${etype}</span>`:''}</div></div></div>`;
+  }).join('');
+}
+
+function renderPagination(){
+  const total=filteredCards.length,totalPages=Math.ceil(total/PAGE_SIZE),pag=$('pagination');
+  if(!pag)return;
+  if(totalPages<=1){pag.style.display='none';return;}
+  pag.style.display='flex';
+  let html=`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>←</button>`;
+  const range=[];
+  for(let i=1;i<=totalPages;i++){if(i===1||i===totalPages||Math.abs(i-currentPage)<=1)range.push(i);else if(range[range.length-1]!=='…')range.push('…');}
+  range.forEach(p=>{if(p==='…')html+=`<span style="padding:0 4px;color:var(--text2)">…</span>`;else html+=`<button class="page-btn${p===currentPage?' active':''}" onclick="goPage(${p})">${p}</button>`;});
+  html+=`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===Math.ceil(filteredCards.length/PAGE_SIZE)?'disabled':''}>→</button>`;
+  pag.innerHTML=html;
+}
+
+window.goPage=p=>{currentPage=p;renderCards();renderPagination();window.scrollTo({top:0,behavior:'smooth'});};
+
+function updateStats(){
+  const total=filteredCards.length,sc=filteredCards.filter(isSong).length,el=$('statsText');
+  if(el)el.innerHTML=`<strong>${total}</strong> 枚${sc?` (歌カード <strong>${sc}</strong>枚)`:''}`;
+}
+
+function buildFilmOptions(cards){
+  const films=new Set();cards.forEach(c=>{const f=getFilm(c);if(f)films.add(f);});
+  const sel=$('filmFilter');if(!sel)return;
+  [...films].sort().forEach(f=>{const o=document.createElement('option');o.value=f;o.textContent=f;sel.appendChild(o);});
+}
+
+window.openModal=el=>{
+  const card=JSON.parse(el.dataset.card);currentModalCard=card;
+  const ic=getIC(card),song=isSong(card),etype=getEType(card);
+  const scene=Object.entries(DISNEY_SCENES).find(([k])=>(card.Name||'').includes(k));
+  let ytUrl=null;for(const[k,v] of Object.entries(YT_MAP)){if((card.Name||'').includes(k)){ytUrl=v;break;}}
+  const abilities=card.Abilities?(Array.isArray(card.Abilities)?card.Abilities:[card.Abilities]):[];
+  const film=getFilm(card),owned=myCollection.has(cid(card));
+  $('modalBody').innerHTML=`
+    <div>
+      <div class="modal-img" style="border:2px solid ${ic}40">
+        <div class="modal-initial" style="background:${ic}18;color:${ic}">${(card.Name||'?')[0]}</div>
+        <span style="font-size:11px;color:var(--text2)">${card.Name||''}</span>
+      </div>
+      <button id="collectBtn" class="collect-btn${owned?' owned':''}" onclick="handleCollect()">${owned?'★ コレクションから削除':'☆ コレクションに追加'}</button>
+      ${!currentUser?'<p class="login-hint">ログインするとコレクション管理できます</p>':''}
+    </div>
+    <div>
+      <h1>${card.Name||''}</h1>
+      ${card.Subtitle?`<div class="detail-sub">${card.Subtitle}</div>`:''}
+      <div class="detail-row">
+        ${card.Color?`<span class="ink-pill" style="border-color:${ic};color:${ic}"><span class="ink-dot-sm" style="background:${ic}"></span>${card.Color}</span>`:''}
+        ${etype?`<span class="badge ${getTBC(etype)}">${etype}</span>`:''}
+        ${card.Rarity?`<span class="badge ${getRC(card)}">${card.Rarity}</span>`:''}
+        ${film?`<span class="film-tag">🎬 ${film}</span>`:''}
+      </div>
+      ${(card.Cost!=null||card.Strength!=null||card.Willpower!=null||card.Lore!=null)?`<div class="stats-grid">${card.Cost!=null?`<div class="stat-box"><div class="stat-label">コスト</div><div class="stat-val" style="color:${ic}">${card.Cost}</div></div>`:''} ${card.Strength!=null?`<div class="stat-box"><div class="stat-label">強さ</div><div class="stat-val">${card.Strength}</div></div>`:''} ${card.Willpower!=null?`<div class="stat-box"><div class="stat-label">意志力</div><div class="stat-val">${card.Willpower}</div></div>`:''} ${card.Lore!=null?`<div class="stat-box"><div class="stat-label">ロア</div><div class="stat-val" style="color:#C9A227">${card.Lore}</div></div>`:''}</div>`:''}
+      ${abilities.length?`<div class="detail-sec"><h3>アビリティ</h3><ul class="ability-list">${abilities.map(a=>`<li>${a}</li>`).join('')}</ul></div>`:''}
+      ${card.Body_Text?`<div class="detail-sec"><h3>テキスト</h3><p>${card.Body_Text}</p></div>`:''}
+      ${card.Flavor_Text?`<div class="detail-sec"><p class="flavor-text">"${card.Flavor_Text}"</p></div>`:''}
+      ${scene?`<div class="detail-sec"><h3>Disney 登場シーン</h3><div class="disney-box"><div class="disney-film">🎬 ${scene[1].film}</div><div class="disney-time">⏱ ${scene[1].time}</div>${scene[1].dp?'<div style="font-size:11px;color:var(--text2);margin-top:3px">📺 Disney+ で視聴可能</div>':''}</div></div>`:''}
+      ${SET_NAMES[card.Set_Num]?`<div class="detail-sec"><h3>セット</h3><span class="set-tag">${SET_NAMES[card.Set_Num]}</span>${card.Artist?` <span style="font-size:11px;color:var(--text2)">— ${card.Artist}</span>`:''}</div>`:''}
+    </div>
+    ${song&&ytUrl?`<div class="yt-wrap"><h3>♪ ソング動画 (YouTube)</h3><iframe class="yt-frame" src="${ytUrl}" title="YouTube" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div>`:''}
+  `;
+  $('modalBg').classList.add('open');
+};
+
+window.handleCollect=async()=>{if(currentModalCard)await toggleCollection(currentModalCard);};
+$('modalClose').onclick=()=>{$('modalBg').classList.remove('open');currentModalCard=null;};
+$('modalBg').onclick=e=>{if(e.target===$('modalBg')){$('modalBg').classList.remove('open');currentModalCard=null;}};
+
+async function renderCollectionPage(){
+  const content=$('collectionContent');if(!content)return;
+  if(!currentUser){
+    content.innerHTML=`<div class="not-logged"><p>コレクション管理にはログインが必要です</p><button class="login-big-btn" onclick="handleAuth()">Googleでログイン</button></div>`;
+    return;
+  }
+  if(myCollection.size===0){
+    content.innerHTML=`<div class="collection-header"><h2>マイコレクション</h2></div><div class="not-logged"><p>まだカードが登録されていません。<br>カード一覧でカードをクリックして「コレクションに追加」してください。</p></div>`;
+    return;
+  }
+  const myCards=allCards.filter(c=>myCollection.has(cid(c)));
+  const total=myCards.length,sc=myCards.filter(isSong).length,lc=myCards.filter(c=>(c.Rarity||'')==='Legendary').length,ec=myCards.filter(c=>(c.Rarity||'')==='Enchanted').length;
+  let html=`<div class="collection-header"><h2>マイコレクション</h2><span style="font-size:13px;color:var(--text2)">${currentUser.displayName||''}</span></div>
+  <div class="collection-stats">
+    <div class="cstat"><div class="cn">${total}</div><div class="cl">総カード数</div></div>
+    <div class="cstat"><div class="cn">${sc}</div><div class="cl">歌カード</div></div>
+    <div class="cstat"><div class="cn">${lc}</div><div class="cl">レジェンダリー</div></div>
+    <div class="cstat"><div class="cn">${ec}</div><div class="cl">エンチャンテッド</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;">`;
+  myCards.forEach(card=>{
+    const ic=getIC(card),etype=getEType(card),cardData=JSON.stringify(card).replace(/"/g,'&quot;');
+    html+=`<div class="card-item owned" onclick="openModal(this)" data-card="${cardData}"><div class="owned-star">★</div><div class="card-img-wrap" style="border-bottom:2px solid ${ic}20"><div class="no-img-initial" style="background:${ic}18;color:${ic}">${(card.Name||'?')[0]}</div><div class="no-img-name">${(card.Name||'').length>16?(card.Name||'').slice(0,15)+'…':card.Name}</div>${isSong(card)?'<div class="song-badge">♪</div>':''}</div><div class="card-info"><div class="card-name">${card.Name||''}</div>${card.Subtitle?`<div class="card-subtitle">${card.Subtitle}</div>`:''}<div class="card-meta"><span class="ink-dot-sm" style="background:${ic}"></span>${etype?`<span class="badge ${getTBC(etype)}">${etype}</span>`:''}<span class="badge ${getRC(card)}">${(card.Rarity||'').replace('Super Rare','SR').replace('Legendary','L').replace('Enchanted','E').replace('Common','C').replace('Uncommon','U').replace('Rare','R')}</span></div></div></div>`;
+  });
+  html+=`</div>`;
+  content.innerHTML=html;
+}
+
+window.switchTab=tab=>{
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+  $('cardsPage').style.display=tab==='cards'?'block':'none';
+  $('collectionPage').style.display=tab==='collection'?'block':'none';
+  if(tab==='collection')renderCollectionPage();
+};
+
+let stimer;
+$('searchInput').oninput=e=>{clearTimeout(stimer);stimer=setTimeout(()=>{searchTerm=e.target.value.toLowerCase();applyFilters();},300);};
+$('filmFilter').onchange=e=>{filmFilter=e.target.value;applyFilters();};
+$('setFilter').onchange=e=>{setFilter=e.target.value;applyFilters();};
+$('rarityFilter').onchange=e=>{rarityFilter=e.target.value;applyFilters();};
+$('typeFilters').querySelectorAll('.pill').forEach(btn=>{btn.onclick=()=>{$('typeFilters').querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');activeType=btn.dataset.type;applyFilters();};});
+$('inkFilters').querySelectorAll('.pill').forEach(btn=>{btn.onclick=()=>{$('inkFilters').querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');activeInk=btn.dataset.ink;applyFilters();};});
+$('gridViewBtn').onclick=()=>{viewMode='grid';$('cardsContainer').className='cards-grid';$('gridViewBtn').classList.add('active');$('listViewBtn').classList.remove('active');renderCards();};
+$('listViewBtn').onclick=()=>{viewMode='list';$('cardsContainer').className='cards-grid list-view';$('listViewBtn').classList.add('active');$('gridViewBtn').classList.remove('active');renderCards();};
+
+(async()=>{
+  const data=await fetchCards();
+  if(!data||!data.length){
+    $('errMsg').innerHTML='<div class="err-msg">⚠️ カードデータの取得に失敗しました。しばらくしてからリロードしてください。</div>';
+    $('loadingDiv').style.display='none';$('cardsContainer').style.display='grid';return;
+  }
+  allCards=data;buildFilmOptions(allCards);
+  $('loadingDiv').style.display='none';$('cardsContainer').style.display='grid';
+  filteredCards=[...allCards];renderCards();renderPagination();updateStats();
+})();
+</script>
+</body>
+</html>
